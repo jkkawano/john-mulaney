@@ -42,10 +42,12 @@ def is_good_response(resp):
 
 
 
-def get_new_in_town(html_file="/data/html/new-in-town.html", out_file="/data/raw-new-in-town"):
+def get_special(special="new-in-town"):
     """
     Uses BeautifulSoup to parse an html file and extract the 'post-content' text
     """
+    html_file = "data/html/" + special + ".html"
+    out_file = "data/raw/raw-" + special
     write_bool = False
     with open(html_file) as fp:
         soup = BeautifulSoup(fp, "html.parser")
@@ -53,13 +55,15 @@ def get_new_in_town(html_file="/data/html/new-in-town.html", out_file="/data/raw
     with open(out_file, "w") as f_out:
         f_out.write(soup.find('div', attrs={'class':'post-content'}).get_text())
 
-def parse_new_in_town():
+def parse_new_in_town(special="new-in-town"):
 
-    get_new_in_town()
+    get_special(special)
+    raw_file = "data/raw/raw-"+special
+    out_file = "data/"+special
     
     write_bool = False
-    with open("data/raw-new-in-town", "r") as fp:
-        with open("data/new-in-town", "w") as fp_out:
+    with open(raw_file, "r") as fp:
+        with open(out_file, "w") as fp_out:
             for l in fp:
                 if l.startswith("(End)"):
                     write_bool = False
@@ -68,13 +72,21 @@ def parse_new_in_town():
                 if l.startswith("(Start)"):
                     write_bool = True
 
+def parse_special(special):
+
+    get_special(special)
+    raw_file = "data/raw/raw-"+special
+    out_file = "data/"+special
+
+    with open(raw_file,"r") as fp:
+        with open(out_file, "w") as fp_out:
+            for l in fp:
+                fp_out.write(l)
+                    
 if __name__ == "__main__":
 
+    parse_new_in_town("new-in-town")
+    parse_special("radio-city")
+    parse_special("comeback-kid")
+
     print("street smarts!")
-    #    get_new_in_town()
-    parse_new_in_town()
-
-    #    url = "https://scrapsfromtheloft.com/2017/09/25/john-mulaney-new-in-town-2012-full-transcript/"
-    #    print(basic_get(url))
-
-               
