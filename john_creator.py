@@ -7,7 +7,7 @@ Something something generating John Mulaney jokes
 from random import choice
 from random import randint
 
-__all__ = ['MulaneyValue']
+__all__ = ['MulaneyValue', 'MulaneyGenerator']
 
 ## define your dict value object
 class MulaneyValue(object):
@@ -62,7 +62,7 @@ class MulaneyGenerator(object):
             self._dist[key] = MulaneyValue(val)
 
     def internalize(self, filename):
-        dat = []
+        dat = ["\n"]
         with open(filename) as f:
             for line in f:
                 for w in line.split():
@@ -87,9 +87,10 @@ class MulaneyGenerator(object):
 
     def produceWords(self, n):
         result = []
+#        w = "Hi"
         w = self.randWord()
         for _ in range(n):
-            result.append(self.nextWord(w))
+            result.append(w)
             w = self.nextWord(w)
         return " ".join(result)
 
