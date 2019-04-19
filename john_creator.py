@@ -17,6 +17,10 @@ class MulaneyValue(object):
         self._total = 0
         self._wordCounts = dict()
 
+    def __init__(self, w):
+        self._total = 1
+        self._wordCounts = {w:1}
+
     def add(self, w):
         """ Adding a new word """
         self._total+=1
@@ -48,17 +52,57 @@ class MulaneyGenerator(object):
     __slots__ = ['_dist']
 
     def __init__(self):
-        ## maps words (strings) to MulaneyObject
+        ## maps words (strings) to MulaneyValue
         self._dist = dict()
 
-    def process(self, filename):
-        pass
+    def addWord(self, key, val):
+        if key in self._dist:
+            self._dist[key].add(val)
+        else:
+            self._dist[key] = MulaneyValue(val)
 
-    def _randomWord(self):
-        return choice(self._dist)
+    def internalize(self, filename):
+        dat = []
+        with open(filename) as f:
+            for line in f:
+                for w in line.split():
+                    dat.append(w.strip('"'))
+                for i in range(len(dat)-1):
+                    self.addWord(dat[i], dat[i+1])
+                if(len(dat)>0): dat = [dat[-1]]
+
+    def internalizeChar(self, filename, n=3):
+        with open(filename) as f:
+            for line in f:
+                for i in range(len(line)-n):
+                    self.addWord(line[i:i+n], line[i+n])
+
+    def randWord(self):
+        return choice(list(self._dist.keys()))
+
+    def nextWord(self, key):
+        if key not in self._dist:
+            return self.randWord()
+        return self._dist[key].randNext()
+
+    def produceWords(self, n):
+        result = []
+        w = self.randWord()
+        for _ in range(n):
+            result.append(self.nextWord(w))
+            w = self.nextWord(w)
+        return " ".join(result)
 
     def _next(self, key):
         return 
 
 if __name__ == "__main__":
+    gen = MulaneyGenerator()
+
+    gen.internalize("data/new-in-town")
+    gen.internalize("data/radio-city")
+    gen.internalize("data/comeback-kid")
+
+    print(gen.produceWords(200))
+    
     print("can my girlfriend come?")
